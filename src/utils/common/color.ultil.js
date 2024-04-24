@@ -13,6 +13,7 @@ const Colors = {
     muted: "#6c757d",
     orange: "#FFA500",
     border: "#dcdcdc",
+    grey: "#808080",
 };
 
 export default Colors;
