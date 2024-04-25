@@ -2,8 +2,10 @@ import React from "react";
 import Colors from "../utils/common/color.ultil";
 import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 import { Controller, useForm } from "react-hook-form";
+import CustomInput from "../components/CustomInput";
+import { validateEmailFormat } from "../utils/common/validate.util";
 
-const LoginScreen = () => {
+const LoginScreen = ({navigation}) => {
   const {
     control,
     handleSubmit,
@@ -17,49 +19,57 @@ const LoginScreen = () => {
 
   const onSubmit = (data) => console.log(data);
 
+  const handleClickSignUp = () => {
+    navigation.navigate("Register");
+  }
 
   return (
     <>
       <View style={styles.container}>
-        <Text style={styles.title}>LoginScreen</Text>
+        <Text style={styles.title}>Login</Text>
         <View>
-          <Controller
+          <CustomInput
             control={control}
-            rules={{
-              required: true,
-            }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                placeholder="Email"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            )}
             name="email"
-          />
-          {errors.email && <Text style={styles.textRequired}>Email is required.</Text>}
-
-          <Controller
-            control={control}
+            label="Email"
             rules={{
-              maxLength: 100,
-              required: true,
+              required: {
+                value: true,
+                message: "Email is required",
+                validate: validateEmailFormat,
+              },
             }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                placeholder="Password"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            )}
-            name="password"
+            placeholder="Enter your email"
+            required={true}
           />
-          {errors.password && <Text style={styles.textRequired}>Password is required.</Text>}
 
+          <CustomInput
+            control={control}
+            name="password"
+            label="Password"
+            rules={{
+              required: {
+                value: true,
+                message: "Password is required",
+              },
+            }}
+            placeholder="Enter your password"
+            secureTextEntry={true}
+            required={true}
+          />
 
-          <Button title="Submit" onPress={handleSubmit(onSubmit)} style={styles.btnSubmit} />
+          <View style={styles.wrapBtnSubmit}>
+            <Button
+              title="Login"
+              onPress={handleSubmit(onSubmit)}
+              style={styles.btnSubmit}
+            />
+          </View>
+
+          <View style={styles.signUpFooter} >
+            <Text>Don't have an account?</Text>
+            <Text style={styles.textSignUp} onPress={handleClickSignUp}>Register</Text>
+          </View>
         </View>
       </View>
     </>
@@ -78,18 +88,32 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "bold",
-    color: Colors.orange,
+    color: Colors.info,
     textAlign: "center",
+    marginVertical: 15,
   },
   textRequired: {
     color: Colors.danger,
   },
+  wrapBtnSubmit: {
+    marginVertical: 10,
+  },  
   btnSubmit: {
-    marginTop: 10,
+    marginVertical: 10,
     padding: 10,
     borderRadius: 5,
+  },
+  signUpFooter: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  textSignUp: {
+    color: Colors.info,
+    marginLeft: 5,
   },
 });
 
