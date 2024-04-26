@@ -9,14 +9,14 @@ import {
   TextInput,
   View,
 } from "react-native";
-import Colors from "../utils/common/color.ultil";
-import CustomInput from "../components/CustomInput";
+import Colors from "../../utils/common/color.ultil";
+import CustomInput from "../../components/CustomInput";
 import {
   validateEmailFormat,
   validatePasswordMatch,
-} from "../utils/common/validate.util";
+} from "../../utils/common/validate.util";
 import { Dropdown } from "react-native-element-dropdown";
-import { optionGenders } from "../utils/data.util";
+import { optionGenders } from "../../utils/data.util";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 const RegisterScreen = () => {

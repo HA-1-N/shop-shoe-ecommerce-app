@@ -1,9 +1,9 @@
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView, StyleSheet } from "react-native";
-import LoginScreen from "./src/screens/LoginScreen";
+import LoginScreen from "./src/screens/login/LoginScreen";
 import { NavigationContainer } from "@react-navigation/native";
-import HomeScreen from "./src/screens/HomeScreen";
-import RegisterScreen from "./src/screens/RegisterScreen";
+import HomeScreen from "./src/screens/home/HomeScreen";
+import RegisterScreen from "./src/screens/register/RegisterScreen";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Provider } from "react-redux";
 import { store } from "./src/redux/store";

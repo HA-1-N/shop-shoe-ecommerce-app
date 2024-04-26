@@ -8,9 +8,9 @@ export const setupAxiosInterceptors = (
     if (!config.ignoreSpinner) {
       increaseFetch();
     }
-    if (!config.headers.Authorization) {
-      config.headers.Authorization = `Bearer ${authContext.getAccessToken()}`;
-    }
+    // if (!config.headers.Authorization) {
+    //   config.headers.Authorization = `Bearer ${authContext.getAccessToken()}`;
+    // }
     return config;
   };
   const onResponseSuccess = (response) => {

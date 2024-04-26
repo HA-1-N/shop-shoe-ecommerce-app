@@ -1,9 +1,9 @@
 import React from "react";
-import Colors from "../utils/common/color.ultil";
+import Colors from "../../utils/common/color.ultil";
 import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 import { Controller, useForm } from "react-hook-form";
-import CustomInput from "../components/CustomInput";
-import { validateEmailFormat } from "../utils/common/validate.util";
+import CustomInput from "../../components/CustomInput";
+import { validateEmailFormat } from "../../utils/common/validate.util";
 
 const LoginScreen = ({navigation}) => {
   const {
