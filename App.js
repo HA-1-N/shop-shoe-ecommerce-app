@@ -11,6 +11,8 @@ import HTTP_ADMIN_SERVICE from "./src/utils/configs/axios.config";
 import { decrement, increment } from "./src/redux/features/counterSlice";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { setupAxiosInterceptors } from "./src/utils/configs/axios-interceptor";
+import NavigationBar from "./src/navigations/NavigationBar";
+import NavigationAuth from "./src/navigations/NavigationAuth";
 
 const Stack = createStackNavigator();
 
@@ -33,12 +35,11 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <Provider store={store}>
-        <NavigationContainer>
+        <NavigationContainer independent={true}>
           <StatusBar style="auto" />
-          <Stack.Navigator>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="NavigationBar" component={NavigationBar} />
+            <Stack.Screen name="NavigationAuth" component={NavigationAuth} />
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>

@@ -4,7 +4,11 @@ import { Text, View } from "react-native";
 const CardCustom = () => {
   return (
     <View>
-      <Text>CardCustom</Text>
+      <View>{/* <Image source={require("../assets/imagename.png")} /> */}</View>
+      <View>
+        <Text>Card Title</Text>
+        <Text>Card Description</Text>
+      </View>
     </View>
   );
 };
