@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FlatList, ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
 import CardCustom from "../../components/CardCustom";
+import { filterProductApi } from "../../api/product.api";
 
 const DATA = [
   {
@@ -23,13 +24,43 @@ const Item = ({title}) => (
   </View>
 );
 
-const HomeListProduct = () => {
+const HomeListProduct = ({handleNavigateProductDetail}) => {
+
+  // const filterProduct = async () => {
+  //   const body = {
+  //     name: null,
+  //     status: null,
+  //     brandId: null,
+  //     categoryId: null,
+  //     colorId: [],
+  //     sizeId: [],
+  //     maxPrice: null,
+  //     minPrice: null,
+  //   }
+  //   const params = {
+  //     page: 1,
+  //     size: 10,
+  //   }
+  //   try {
+  //     const response = await filterProductApi(body, params);
+  //     console.log(response.data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   filterProduct();
+  // }, []);
+
   return (
     <ScrollView>
       <View style={styles.container}>
         <View style={styles.row}>
           <View style={styles.col}>
-            <CardCustom />
+            <CardCustom
+              handleNavigateProductDetail={handleNavigateProductDetail}
+            />
           </View>
           <View style={styles.col}>
             <CardCustom />

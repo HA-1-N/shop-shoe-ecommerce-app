@@ -1,9 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView, StyleSheet } from "react-native";
-import LoginScreen from "./src/screens/login/LoginScreen";
 import { NavigationContainer } from "@react-navigation/native";
-import HomeScreen from "./src/screens/home/HomeScreen";
-import RegisterScreen from "./src/screens/register/RegisterScreen";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Provider } from "react-redux";
 import { store } from "./src/redux/store";
@@ -13,6 +10,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { setupAxiosInterceptors } from "./src/utils/configs/axios-interceptor";
 import NavigationBar from "./src/navigations/NavigationBar";
 import NavigationAuth from "./src/navigations/NavigationAuth";
+import NavigationProductDetail from "./src/navigations/NavigationProductDetail";
 
 const Stack = createStackNavigator();
 
@@ -40,6 +38,10 @@ export default function App() {
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="NavigationBar" component={NavigationBar} />
             <Stack.Screen name="NavigationAuth" component={NavigationAuth} />
+            <Stack.Screen
+              name="NavigationProductDetail"
+              component={NavigationProductDetail}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>
