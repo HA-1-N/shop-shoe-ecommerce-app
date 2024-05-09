@@ -62,7 +62,7 @@ const data = [
   },
 ];
 
-const CartScreen = () => {
+const CartScreen = ({ navigation }) => {
   return (
     <View>
       <ScrollView
@@ -83,28 +83,33 @@ const CartScreen = () => {
           ))}
         </View>
         <View style={styles.wrapBox}>
-          <Text style={styles.title}>Total: <Text style={styles.content}>1000$</Text></Text>
+          <Text style={styles.title}>
+            Total: <Text style={styles.content}>1000$</Text>
+          </Text>
         </View>
 
         <View style={styles.line}></View>
 
         <View style={styles.wrapBox}>
-          <Text style={styles.title}>Shipping Fee: <Text style={styles.content}>10$</Text></Text>
+          <Text style={styles.title}>
+            Shipping Fee: <Text style={styles.content}>10$</Text>
+          </Text>
         </View>
 
         <View style={styles.line}></View>
 
         <View style={styles.wrapBox}>
-          <Text style={styles.title}>Total Payment: <Text style={styles.content}>1010$</Text></Text>
+          <Text style={styles.title}>
+            Total Payment: <Text style={styles.content}>1010$</Text>
+          </Text>
           <View style={styles.btn}>
-            <Button title="Checkout" onPress={() => {}} />
+            <Button title="Checkout" onPress={() => {navigation.navigate("NavigationCheckout");}} />
           </View>
         </View>
-
       </ScrollView>
     </View>
   );
-} 
+}; 
 
 const styles = StyleSheet.create({
   container: {

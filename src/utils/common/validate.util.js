@@ -16,6 +16,14 @@ export const validatePasswordMatch = (value, allValues) => {
   return "Passwords do not match.";
 };
 
+export const validateNewPasswordMatch = (value, allValues) => {
+  const { newPassword } = allValues;
+  if (value === newPassword) {
+    return true;
+  }
+  return "New passwords do not match.";
+};
+
 export const validatePhoneNumber = (value) => {
   // Regular expression for phone number validation
   const phoneRegex = /^[0-9]{10,11}$/; // Accept 10 or 11 digits

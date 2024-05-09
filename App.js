@@ -11,6 +11,9 @@ import { setupAxiosInterceptors } from "./src/utils/configs/axios-interceptor";
 import NavigationBar from "./src/navigations/NavigationBar";
 import NavigationAuth from "./src/navigations/NavigationAuth";
 import NavigationProductDetail from "./src/navigations/NavigationProductDetail";
+import NavigationCheckout from "./src/navigations/NavigationCheckout";
+import EditProfileNavigation from "./src/navigations/EditProfileNavigation";
+import ChangePasswordNavigation from "./src/navigations/ChangePasswordNavigation";
 
 const Stack = createStackNavigator();
 
@@ -41,6 +44,18 @@ export default function App() {
             <Stack.Screen
               name="NavigationProductDetail"
               component={NavigationProductDetail}
+            />
+            <Stack.Screen
+              name="NavigationCheckout"
+              component={NavigationCheckout}
+            />
+            <Stack.Screen
+              name="EditProfile"
+              component={EditProfileNavigation}
+            />
+            <Stack.Screen
+              name="ChangePassword"
+              component={ChangePasswordNavigation}
             />
           </Stack.Navigator>
         </NavigationContainer>
