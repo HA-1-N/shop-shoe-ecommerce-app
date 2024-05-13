@@ -40,9 +40,9 @@ const SettingScreen = ({navigation}) => {
       <TouchableOpacity style={styles.menuItem} onPress={onPressChangePassword}>
         <Text>Change Password</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.menuItem}>
+      {/* <TouchableOpacity style={styles.menuItem}>
         <Text>Saved Cards & Wallet</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <TouchableOpacity style={styles.menuItem}>
         <Text>Logout</Text>

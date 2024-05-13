@@ -1,48 +1,104 @@
-import React, { useState } from 'react'
-import { Dimensions, Image, ImageBackground, StyleSheet, Text, View } from 'react-native'
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import Carousel from 'react-native-reanimated-carousel';
-import Colors from '../../utils/common/color.ultil';
+import React, { useEffect, useState } from "react";
+import {
+  Dimensions,
+  Image,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import Carousel from "react-native-reanimated-carousel";
+import Colors from "../../utils/common/color.ultil";
+import { getProductByIdApi } from "../../api/product.api";
 
-const imagesData = [
-  "https://product.hstatic.net/200000410665/product/dsc00591_2a3d11abbdeb4df88c43b4eed8d61591.jpg",
-  "https://product.hstatic.net/200000410665/product/2024-01-19_15-18-09__b_r8_s4__7aa0d4199c7145a19396a708eb05bb92.jpg",
-  "https://product.hstatic.net/200000410665/product/2024-01-19_15-21-14__b_r8_s4__450171e53a9b43c688a7c1c03d854584.jpg"
-];
+const ProductDetailScreen = ({ route }) => {
+  const { id } = route.params;
 
-const sizeData = [
-  "S",
-  "M",
-  "L",
-  "XL",
-  "XXL"
-];
+  const [productDetail, setProductDetail] = useState({});
+  const [listColor, setListColor] = useState([]);
+  const [listSizeColor, setListSizeColor] = useState([]);
+  const [listProductImage, setListProductImage] = useState([]);
+  const [productQuantitiesDetail, setProductQuantitiesDetail] = useState([]);
 
-const colorData = [
-  {
-    color: "Red",
-    code: "#FF0000",
-  },
-  {
-    color: "Green",
-    code: "#00FF00",
-  },
-  {
-    color: "Blue",
-    code: "#0000FF",
-  },
-  {
-    color: "Yellow",
-    code: "#FFFF00",
-  },
-];
-
-const ProductDetailScreen = () => {
-  const [selectedColor, setSelectedColor] = useState(colorData[0].code);
-  const [selectedSize, setSelectedSize] = useState(sizeData[0]);
+  const [selectedColor, setSelectedColor] = useState({});
+  const [selectedSize, setSelectedSize] = useState({});
   const [quantity, setQuantity] = useState(1);
 
+  const getProductById = async () => {
+    try {
+      const response = await getProductByIdApi(id);
+      const productQuantities = response.data?.productQuantities;
+
+      const sizeColorArr = productQuantities?.map((item) => ({
+        size: item?.size,
+        color: item?.color,
+      }));
+
+      const transformedDataSizeColor = sizeColorArr.reduce((acc, item) => {
+        const existingItem = acc.find((i) => i.color.id === item.color.id);
+
+        if (existingItem) {
+          existingItem.size.push(item.size);
+        } else {
+          acc.push({
+            color: item.color,
+            size: [item.size],
+          });
+        }
+
+        return acc;
+      }, []);
+
+      setListSizeColor(transformedDataSizeColor);
+
+      const getListColor = transformedDataSizeColor?.map((item) => item.color);
+      const getSizeByColor = transformedDataSizeColor
+        ?.filter((item) => item.color.id === getListColor[0]?.id)
+        ?.map((item) => item.size)
+        ?.flat();
+
+      const getListImage = getImagesBySizeAndColor(
+        productQuantities,
+        getSizeByColor[0],
+        getListColor[0]
+      );
+
+      const getImageUrl = getListImage.map((item) => item?.url);
+
+      setProductDetail(response?.data);
+      setProductQuantitiesDetail(productQuantities);
+      setListProductImage(getImageUrl);
+      setListColor(getListColor);
+      setProductQuantitiesDetail(productQuantities);
+      setSelectedColor(getListColor[0]);
+      setSelectedSize(getSizeByColor[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getProductById();
+  }, []);
+
+  const getImagesBySizeAndColor = (productQuantities, size, color) => {
+    const images = [];
+    productQuantities?.forEach((item) => {
+      if (
+        item?.size?.name === size?.name &&
+        item?.color?.name === color?.name
+      ) {
+        images.push(item?.productQuantityImages);
+      }
+    });
+
+    return images.flat();
+  };
+
   const handleColorChange = (color) => {
+    const getListImage = getImagesBySizeAndColor(productQuantitiesDetail, selectedSize, color);
+    setListProductImage(getListImage.map((item) => item?.url));
     setSelectedColor(color);
   };
 
@@ -50,7 +106,7 @@ const ProductDetailScreen = () => {
     setSelectedSize(size);
   };
 
-  const width = Dimensions.get('window').width;
+  const width = Dimensions.get("window").width;
 
   return (
     <View style={styles.container}>
@@ -62,7 +118,7 @@ const ProductDetailScreen = () => {
             height={width / 2}
             autoPlay={true}
             autoPlayInterval={3000}
-            data={imagesData}
+            data={listProductImage}
             scrollAnimationDuration={1000}
             onSnapToItem={(index) => {}}
             pagingEnabled={true}
@@ -96,15 +152,11 @@ const ProductDetailScreen = () => {
 
       <View style={styles.wrap}>
         <View>
-          <Text style={styles.title}>Product Detail</Text>
+          <Text style={styles.title}>{productDetail?.name}</Text>
         </View>
 
         <View>
-          <Text style={styles.description}>
-            Lorem Ipsum has been the industry's standard dummy text ever since
-            the 1500s, when an unknown printer took a galley of type and
-            scrambled it to make a type specimen book
-          </Text>
+          <Text style={styles.description}>{productDetail?.description}</Text>
           <View style={{ marginTop: 10 }}>
             <Text style={styles.colorTitle}>Color: </Text>
             <View
@@ -114,7 +166,7 @@ const ProductDetailScreen = () => {
                 alignItems: "center",
               }}
             >
-              {colorData.map((color, index) => (
+              {listColor.map((color, index) => (
                 <TouchableOpacity
                   key={index}
                   onPress={() => handleColorChange(color.code)}
@@ -144,29 +196,34 @@ const ProductDetailScreen = () => {
                 alignItems: "center",
               }}
             >
-              {sizeData.map((size, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => handleSizeChange(size)}
-                  style={[
-                    styles.sizeBox,
-                    {
-                      backgroundColor: selectedSize === size ? "#000" : "#fff",
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.sizeText,
-                      {
-                        color: selectedSize === size ? "#fff" : "#000",
-                      },
-                    ]}
-                  >
-                    {size}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              {listSizeColor
+                ?.filter((item) => item?.color?.name === selectedColor?.name)
+                ?.map((item) =>
+                  item?.size?.map((size, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() => handleSizeChange(size)}
+                      style={[
+                        styles.sizeBox,
+                        {
+                          backgroundColor:
+                            selectedSize === size ? "#000" : "#fff",
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.sizeText,
+                          {
+                            color: selectedSize === size ? "#fff" : "#000",
+                          },
+                        ]}
+                      >
+                        {size?.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))
+                )}
             </View>
           </View>
 
@@ -194,7 +251,11 @@ const ProductDetailScreen = () => {
                   }
                 }}
               >
-                <Text style={{ color: "#FFF", textAlign: "center" , fontSize: 16 }}>-</Text>
+                <Text
+                  style={{ color: "#FFF", textAlign: "center", fontSize: 16 }}
+                >
+                  -
+                </Text>
               </TouchableOpacity>
               <Text>{quantity}</Text>
               <TouchableOpacity
@@ -207,9 +268,14 @@ const ProductDetailScreen = () => {
                   marginLeft: 10,
                 }}
               >
-                <Text style={{ color: "#FFF", textAlign: "center" , fontSize: 16 }} onPress={() => {
-                  setQuantity(quantity + 1);
-                }}>+</Text>
+                <Text
+                  style={{ color: "#FFF", textAlign: "center", fontSize: 16 }}
+                  onPress={() => {
+                    setQuantity(quantity + 1);
+                  }}
+                >
+                  +
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -218,7 +284,9 @@ const ProductDetailScreen = () => {
             style={{ marginTop: 10, display: "flex", flexDirection: "row" }}
           >
             <Text style={styles.colorTitle}>Price: </Text>
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>100$</Text>
+            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+              {productDetail?.price?.toLocaleString("en-US")} VND
+            </Text>
           </View>
         </View>
       </View>

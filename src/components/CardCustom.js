@@ -1,21 +1,22 @@
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Colors from "../utils/common/color.ultil";
 
-const CardCustom = ({handleNavigateProductDetail}) => {
+const CardCustom = ({ handleNavigateProductDetail, imageUrl, productName, price, id }) => {
   return (
-    <View>
-      <TouchableOpacity onPress={handleNavigateProductDetail}>
+    <View style={styles.container}>
+      <TouchableOpacity onPress={() => handleNavigateProductDetail(id)}>
         <View>
           <Image
             style={styles.image}
             source={{
-              uri: "https://product.hstatic.net/200000278317/product/y-da-bong-nike-zoom-mercurial-vapor-15-pro-tf-dj5605-300-xanh-la-tim-1_720391bc725f4bf79f30011bcece0cb7_master.jpg",
+              uri: imageUrl,
             }}
           />
         </View>
         <View>
-          <Text>Card Title</Text>
-          <Text>Card Description</Text>
+          <Text style={styles.title}>{productName}</Text>
+          <Text style={styles.price}>{price?.toLocaleString("en-US")} VND</Text>
         </View>
       </TouchableOpacity>
     </View>
@@ -23,9 +24,22 @@ const CardCustom = ({handleNavigateProductDetail}) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: Colors.white,
+  },
   image: {
     flex: 1,
     aspectRatio: 1,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: "bold",
+    padding: 10,
+  },
+  price: {
+    fontSize: 14,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
   },
 });
 

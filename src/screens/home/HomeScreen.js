@@ -1,19 +1,14 @@
 import React from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import {  StyleSheet, View } from "react-native";
 import HomeSearch from "./HomeSearch";
 import HomeListProduct from "./HomeListProduct";
 
-const HomeScreen = ({navigation}) => {
-
-  const handleNavigateProductDetail = () => {
-    navigation.navigate("NavigationProductDetail");
-  }
-
+const HomeScreen = ({ navigation }) => {
   return (
     <>
       <View>
         <HomeSearch />
-        <HomeListProduct handleNavigateProductDetail={handleNavigateProductDetail}/>
+        <HomeListProduct navigation={navigation} />
       </View>
     </>
   );

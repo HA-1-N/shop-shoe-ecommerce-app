@@ -1,178 +1,62 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
 import CardCustom from "../../components/CardCustom";
 import { filterProductApi } from "../../api/product.api";
 
-const DATA = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    title: 'First Item',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Second Item',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    title: 'Third Item',
-  },
-];
+const HomeListProduct = ({ navigation }) => {
 
-const Item = ({title}) => (
-  <View style={styles.item}>
-    <Text style={styles.title}>{title}</Text>
-  </View>
-);
+  const [productDetails, setProductDetails] = useState([]);
 
-const HomeListProduct = ({handleNavigateProductDetail}) => {
+  const filterProduct = async () => {
+    const body = {
+      name: null,
+      status: null,
+      brandId: null,
+      categoryId: null,
+      colorId: null,
+      sizeId: null,
+      maxPrice: null,
+      minPrice: null,
+    };
+    const params = {
+      page: 0,
+      size: 10,
+    };
+    try {
+      const response = await filterProductApi(body, params);
+      setProductDetails(response?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  // const filterProduct = async () => {
-  //   const body = {
-  //     name: null,
-  //     status: null,
-  //     brandId: null,
-  //     categoryId: null,
-  //     colorId: [],
-  //     sizeId: [],
-  //     maxPrice: null,
-  //     minPrice: null,
-  //   }
-  //   const params = {
-  //     page: 1,
-  //     size: 10,
-  //   }
-  //   try {
-  //     const response = await filterProductApi(body, params);
-  //     console.log(response.data);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
+  useEffect(() => {
+    filterProduct();
+  }, []);
 
-  // useEffect(() => {
-  //   filterProduct();
-  // }, []);
-
+  const handleNavigateProductDetail = (id) => {
+    navigation.navigate("NavigationProductDetail", { id: id });
+  };
   return (
-    <ScrollView>
+    <ScrollView
+      contentContainerStyle={{ paddingBottom: 120 }}
+      contentInsetAdjustmentBehavior="automatic"
+      alwaysBounceVertical={true}
+      snapToEnd={true}
+    >
       <View style={styles.container}>
         <View style={styles.row}>
-          <View style={styles.col}>
-            <CardCustom
-              handleNavigateProductDetail={handleNavigateProductDetail}
-            />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
-          <View style={styles.col}>
-            <CardCustom />
-          </View>
+          {productDetails?.map((item, index) => (
+            <View key={index} style={styles.col}>
+              <CardCustom
+                id={item?.id}
+                handleNavigateProductDetail={handleNavigateProductDetail}
+                imageUrl={item?.productImages[0]?.url}
+                productName={item?.name}
+                price={item?.price}
+              />
+            </View>
+          ))}
         </View>
       </View>
     </ScrollView>
@@ -185,6 +69,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     marginTop: StatusBar.currentHeight || 0,
     paddingHorizontal: 10,
+    // height: '100%',
   },
   row: {
     flexDirection: 'row',

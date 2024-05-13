@@ -82,7 +82,7 @@ const NavigationBar = () => {
         component={CartScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <Icon name="add-circle" size={48} color="#E9446A" />
+            <Icon name="cart-outline" size={48} color="#E9446A" />
           ),
           tabBarButton: (props) => <CustomTabBarButton {...props} />,
         }}
