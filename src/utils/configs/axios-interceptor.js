@@ -1,16 +1,19 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 export const setupAxiosInterceptors = (
-  authContext,
+  onUnauthenticated,
   increaseFetch,
   decreaseFetch,
   axiosCustom
 ) => {
-  const onRequestSuccess = (config) => {
+  const onRequestSuccess = async (config) => {
     if (!config.ignoreSpinner) {
       increaseFetch();
     }
-    // if (!config.headers.Authorization) {
-    //   config.headers.Authorization = `Bearer ${authContext.getAccessToken()}`;
-    // }
+    const token = await AsyncStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   };
   const onResponseSuccess = (response) => {

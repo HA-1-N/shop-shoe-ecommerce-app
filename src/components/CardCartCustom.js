@@ -15,7 +15,7 @@ const CardCartCustom = ({ productName, price, quantity }) => {
         />
         <View>
           <Text>{productName}</Text>
-          <Text>Price: {price}$ </Text>
+          <Text>Price: {price?.toLocaleString("en-US")} VND </Text>
           <View style={styles.wrap}>
             <Text>Quantity: </Text>
             <View style={styles.wrap}>
@@ -26,7 +26,7 @@ const CardCartCustom = ({ productName, price, quantity }) => {
                   color={Colors.primary}
                 />
               </TouchableOpacity>
-              <Text style={{ marginHorizontal: 10 }}>1</Text>
+              <Text style={{ marginHorizontal: 10 }}>{quantity}</Text>
               <TouchableOpacity>
                 <Icon
                   name="add-circle-outline"

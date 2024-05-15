@@ -3,12 +3,14 @@ import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ModalConfirm from "../../components/modal/ModalConfirm";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { logoutApi } from "../../api/auth.api";
+import { getCurrentUserByIdApi } from "../../api/user.api";
+import { set } from "react-hook-form";
 
 const SettingScreen = ({ navigation }) => {
   const [openModalConfirm, setOpenModalConfirm] = useState(false);
   const [refreshToken, setRefreshToken] = useState("");
   const [userId, setUserId] = useState(null);
-  console.log("userId", userId);
+  const [userDetail, setUserDetail] = useState({});
 
   const getIdLocalStorage = async () => {
     try {
@@ -29,9 +31,20 @@ const SettingScreen = ({ navigation }) => {
     }
   };
 
+  const getUserById = async () => {
+    // Add your get user by id logic here
+    try {
+      const res = await getCurrentUserByIdApi(userId);
+      setUserDetail(res.data);
+    } catch (error) {
+      console.log("Error getting user by id", error);
+    }
+  };
+
   useEffect(() => {
     getRefreshToken();
     getIdLocalStorage();
+    getUserById();
   }, []);
 
   const onPressEditProfile = () => {
@@ -88,7 +101,7 @@ const SettingScreen = ({ navigation }) => {
                 style={styles.avatar}
               /> */}
             <View>
-              <Text style={styles.greeting}>Hello, Amelia</Text>
+              <Text style={styles.greeting}>Hello, {userDetail?.name}</Text>
               <View style={styles.buttonsContainer}>
                 <TouchableOpacity style={styles.button}>
                   <Text style={styles.buttonText}>Your Order</Text>

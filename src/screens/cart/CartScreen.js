@@ -1,68 +1,47 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, StyleSheet, Text, View } from 'react-native'
 import CardCartCustom from '../../components/CardCartCustom';
 import { ScrollView } from 'react-native-gesture-handler';
-
-const data = [
-  {
-    id: 1,
-    name: "Product 1",
-    price: 100,
-    quantity: 1,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 2,
-    name: "Product 2",
-    price: 200,
-    quantity: 2,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 3,
-    name: "Product 3",
-    price: 300,
-    quantity: 2,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 4,
-    name: "Product 3",
-    price: 300,
-    quantity: 2,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 5,
-    name: "Product 3",
-    price: 300,
-    quantity: 2,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 6,
-    name: "Product 3",
-    price: 300,
-    quantity: 2,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 7,
-    name: "Product 3",
-    price: 300,
-    quantity: 2,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 8,
-    name: "Product 113",
-    price: 300,
-    quantity: 2,
-    image: "https://via.placeholder.com/150",
-  },
-];
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getCartItemApi } from '../../api/cart.api';
 
 const CartScreen = ({ navigation }) => {
+
+  const [userId, setUserId] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
+
+  const getIdLocalStorage = async () => {
+    // Add your get id logic here
+    try {
+      const id = await AsyncStorage.getItem("id");
+      setUserId(Number(id));
+    } catch (error) {
+      console.log("Error getting user id", error);
+    }
+  };
+
+  useEffect(() => {
+    getIdLocalStorage();
+  }, []);
+
+  const getCartItems = async () => {
+    // Add your get cart items logic here
+    try {
+      const response = await getCartItemApi(Number(4));
+      setCartItems(response.data);
+    } catch (error) {
+      console.log("Error getting cart items", error);
+    }
+  };
+
+  useEffect(() => {
+    getCartItems();
+  }, [userId]);
+
+  const total = cartItems?.reduce((acc, item) => {
+    return acc + item.product.price * item.quantity;
+  }, 0);
+
   return (
     <View>
       <ScrollView
@@ -72,19 +51,26 @@ const CartScreen = ({ navigation }) => {
         snapToEnd={true}
       >
         <View>
-          {data.map((item) => (
+          {cartItems.map((item) => (
             <CardCartCustom
               key={item.id}
-              productName={item.name}
-              price={item.price}
-              quantity={item.quantity}
+              productName={item?.product?.name}
+              price={item?.product?.price}
+              quantity={item?.quantity}
               image={item.image}
             />
           ))}
         </View>
+
         <View style={styles.wrapBox}>
+          <Text style={{ fontSize: 18, fontWeight: 600, marginBottom: 10 }}>
+            Tổng đơn hàng
+          </Text>
+          <Text style={{ fontSize: 16, fontWeight: 600, marginBottom: 10 }}>
+            {cartItems?.length} products
+          </Text>
           <Text style={styles.title}>
-            Total: <Text style={styles.content}>1000$</Text>
+            Total: <Text style={styles.content}>{total?.toLocaleString("en-US")} VND</Text>
           </Text>
         </View>
 
@@ -92,18 +78,15 @@ const CartScreen = ({ navigation }) => {
 
         <View style={styles.wrapBox}>
           <Text style={styles.title}>
-            Shipping Fee: <Text style={styles.content}>10$</Text>
-          </Text>
-        </View>
-
-        <View style={styles.line}></View>
-
-        <View style={styles.wrapBox}>
-          <Text style={styles.title}>
-            Total Payment: <Text style={styles.content}>1010$</Text>
+            Total Payment: <Text style={styles.content}>{total?.toLocaleString("en-US")} VND</Text>
           </Text>
           <View style={styles.btn}>
-            <Button title="Checkout" onPress={() => {navigation.navigate("NavigationCheckout");}} />
+            <Button
+              title="Checkout"
+              onPress={() => {
+                navigation.navigate("NavigationCheckout");
+              }}
+            />
           </View>
         </View>
       </ScrollView>
