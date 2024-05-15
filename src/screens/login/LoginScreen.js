@@ -4,6 +4,8 @@ import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import CustomInput from "../../components/CustomInput";
 import { validateEmailFormat } from "../../utils/common/validate.util";
+import { loginApi } from "../../api/auth.api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen = ({navigation}) => {
   const {
@@ -17,7 +19,19 @@ const LoginScreen = ({navigation}) => {
     },
   });
 
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = async (data) => {
+    try {
+      const res = await loginApi(data);
+      if (res) {
+        await AsyncStorage.setItem("token", res?.data?.token);
+        await AsyncStorage.setItem("id", res?.data?.id?.toString());
+        await AsyncStorage.setItem("refreshToken", res?.data?.refreshToken);
+        navigation.navigate("NavigationBar");
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
 
   const handleClickSignUp = () => {
     navigation.navigate("Register");
