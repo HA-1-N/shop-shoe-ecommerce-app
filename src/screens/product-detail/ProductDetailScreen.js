@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -12,9 +12,14 @@ import Carousel from "react-native-reanimated-carousel";
 import Colors from "../../utils/common/color.ultil";
 import { getProductByIdApi } from "../../api/product.api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { addToCartApi } from "../../api/cart.api";
+import { useDispatch } from "react-redux";
+import { incrementCart } from "../../redux/features/cart.slice";
 
 const ProductDetailScreen = ({ route, navigation }) => {
   const { id } = route.params;
+
+  const dispatch = useDispatch();
 
   const [productDetail, setProductDetail] = useState({});
   const [listColor, setListColor] = useState([]);
@@ -154,23 +159,38 @@ const ProductDetailScreen = ({ route, navigation }) => {
   };
 
   const handleAddToCart = () => {
-    // const product = {
-    //   id: productDetail?.id,
-    //   name: productDetail?.name,
-    //   price: productDetail?.price,
-    //   color: selectedColor,
-    //   size: selectedSize,
-    //   quantity: quantity,
-    //   image: listProductImage[0],
-    // };
-
     if (idStorage !== null) {
       // Add to cart
+      const product = {
+        userId: Number(idStorage),
+        productId: Number(productDetail?.id),
+        quantity: quantity,
+        colorId: selectedColor?.id,
+        sizeId: selectedSize?.id,
+      };
+      addToCartApi(product).then((response) => {
+        console.log("response", response);
+        if (response.status === 200) {
+          dispatch(incrementCart());
+          alert("Add to cart successfully");
+          navigation.navigate("Cart");
+        }
+      });
     } else {
       // Redirect to login
       navigation.navigate("NavigationAuth");
     }
   };
+
+  const incrementQuantity = useCallback(() => {
+    setQuantity(prevQuantity => prevQuantity + 1);
+  }, []);
+
+  const decrementQuantity = useCallback(() => {
+    setQuantity((prevQuantity) =>
+      prevQuantity > 1 ? prevQuantity - 1 : prevQuantity
+    );
+  }, []);
 
   const width = Dimensions.get("window").width;
 
@@ -311,11 +331,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
                   borderRadius: 5,
                   marginRight: 10,
                 }}
-                onPress={() => {
-                  if (quantity > 1) {
-                    setQuantity(quantity - 1);
-                  }
-                }}
+                onPress={decrementQuantity}
               >
                 <Text
                   style={{ color: "#FFF", textAlign: "center", fontSize: 16 }}
@@ -336,9 +352,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
               >
                 <Text
                   style={{ color: "#FFF", textAlign: "center", fontSize: 16 }}
-                  onPress={() => {
-                    setQuantity(quantity + 1);
-                  }}
+                  onPress={incrementQuantity}
                 >
                   +
                 </Text>

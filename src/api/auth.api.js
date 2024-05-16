@@ -11,3 +11,7 @@ export const registerApi = (body) => {
 export const logoutApi = (params) => {
   return HTTP_SERVICE.post(`/auth/logout?refreshToken=${params}`);
 };
+
+export const changePasswordApi = (body) => {
+  return HTTP_SERVICE.post("/auth/change-password", body);
+};

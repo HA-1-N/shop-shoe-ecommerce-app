@@ -6,8 +6,13 @@ import CustomInput from "../../components/CustomInput";
 import { validateEmailFormat } from "../../utils/common/validate.util";
 import { loginApi } from "../../api/auth.api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+import { incrementCountNumberLogin } from "../../redux/features/auth.slice";
 
 const LoginScreen = ({navigation}) => {
+
+  const dispatch = useDispatch();
+
   const {
     control,
     handleSubmit,
@@ -26,6 +31,7 @@ const LoginScreen = ({navigation}) => {
         await AsyncStorage.setItem("token", res?.data?.token);
         await AsyncStorage.setItem("id", res?.data?.id?.toString());
         await AsyncStorage.setItem("refreshToken", res?.data?.refreshToken);
+        dispatch(incrementCountNumberLogin());  
         navigation.navigate("NavigationBar");
       }
     } catch (error) {

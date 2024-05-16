@@ -3,9 +3,15 @@ import { Button, StyleSheet, Text, View } from 'react-native'
 import CardCartCustom from '../../components/CardCartCustom';
 import { ScrollView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getCartItemApi } from '../../api/cart.api';
+import { getCartItemApi, removeCartItemApi } from '../../api/cart.api';
+import { useDispatch, useSelector } from 'react-redux';
+import { incrementCart } from '../../redux/features/cart.slice';
 
 const CartScreen = ({ navigation }) => {
+
+  const dispatch = useDispatch();
+
+  const countCartIncrement = useSelector((state) => state.cart.countCartIncrement);
 
   const [userId, setUserId] = useState(null);
   const [cartItems, setCartItems] = useState([]);
@@ -36,11 +42,32 @@ const CartScreen = ({ navigation }) => {
 
   useEffect(() => {
     getCartItems();
-  }, [userId]);
+  }, [userId, countCartIncrement]);
 
   const total = cartItems?.reduce((acc, item) => {
     return acc + item.product.price * item.quantity;
   }, 0);
+
+  const handleNavigateProductDetail = (id) => {
+    navigation.navigate("NavigationProductDetail", { id: id });
+  };
+
+  const handleRemoveCartItem = async (cartItemId) => {
+    // Add your remove cart item logic here
+    if (!cartItemId) {
+      return;
+    }
+
+    try {
+      const res = await removeCartItemApi({ cartItemId });
+      if (res.status === 200) {
+      dispatch(incrementCart());
+       alert("Remove cart item successfully");
+      }
+    } catch (error) {
+      console.log("Error removing cart item", error);
+    }
+  }
 
   return (
     <View>
@@ -54,10 +81,14 @@ const CartScreen = ({ navigation }) => {
           {cartItems.map((item) => (
             <CardCartCustom
               key={item.id}
+              cartItemId={item.id}
+              productId={item?.product?.id}
               productName={item?.product?.name}
               price={item?.product?.price}
               quantity={item?.quantity}
               image={item.image}
+              handleNavigateProductDetail={handleNavigateProductDetail}
+              handleRemoveCartItem={handleRemoveCartItem}
             />
           ))}
         </View>

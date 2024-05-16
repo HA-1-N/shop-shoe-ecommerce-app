@@ -4,9 +4,14 @@ import ModalConfirm from "../../components/modal/ModalConfirm";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { logoutApi } from "../../api/auth.api";
 import { getCurrentUserByIdApi } from "../../api/user.api";
-import { set } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import { incrementCountNumberLogin } from "../../redux/features/auth.slice";
 
 const SettingScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
+
+  const countNumberLogin = useSelector((state) => state?.auth?.countNumberLogin);
+
   const [openModalConfirm, setOpenModalConfirm] = useState(false);
   const [refreshToken, setRefreshToken] = useState("");
   const [userId, setUserId] = useState(null);
@@ -42,10 +47,15 @@ const SettingScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
+    if (userId !== null) {
+      getUserById();
+    }
+  }, [userId, countNumberLogin]);
+
+  useEffect(() => {
     getRefreshToken();
     getIdLocalStorage();
-    getUserById();
-  }, []);
+  }, [userId, countNumberLogin]);
 
   const onPressEditProfile = () => {
     navigation.navigate("EditProfile");
@@ -68,6 +78,7 @@ const SettingScreen = ({ navigation }) => {
         await AsyncStorage.removeItem("token");
         await AsyncStorage.removeItem("id");
         await AsyncStorage.removeItem("refreshToken");
+        dispatch(incrementCountNumberLogin());
         navigation.navigate("NavigationAuth");
         alert("You have been logged out");
       }
@@ -83,6 +94,13 @@ const SettingScreen = ({ navigation }) => {
   const handleClickBtnNavigateLogin = () => {
     navigation.navigate("NavigationAuth");
   }
+
+  const onPressClearStorage = async () => {
+    await AsyncStorage.removeItem("token");
+    await AsyncStorage.removeItem("id");
+    await AsyncStorage.removeItem("refreshToken");
+    dispatch(incrementCountNumberLogin());
+  };
 
   return (
     <>
@@ -135,11 +153,22 @@ const SettingScreen = ({ navigation }) => {
             <Text>Logout</Text>
           </TouchableOpacity>
           {/* Add more menu items as needed */}
+
+          {/* Clear storage */}
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={onPressClearStorage}
+          >
+            <Text>Clear Storage</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <View style={styles.container}>
           <Text style={{ marginVertical: 10 }}>You are not logged in</Text>
-          <Button onPress={handleClickBtnNavigateLogin} title="Click to Login" />
+          <Button
+            onPress={handleClickBtnNavigateLogin}
+            title="Click to Login"
+          />
         </View>
       )}
     </>
