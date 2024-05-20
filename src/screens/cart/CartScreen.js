@@ -33,7 +33,7 @@ const CartScreen = ({ navigation }) => {
   const getCartItems = async () => {
     // Add your get cart items logic here
     try {
-      const response = await getCartItemApi(Number(4));
+      const response = await getCartItemApi(Number(userId));
       setCartItems(response.data);
     } catch (error) {
       console.log("Error getting cart items", error);

@@ -4,6 +4,7 @@ import {
   Button,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -72,121 +73,134 @@ const RegisterScreen = () => {
     <>
       <View style={styles.container}>
         <Text style={styles.title}>Register</Text>
-        <View>
-          <CustomInput
-            control={control}
-            name={"name"}
-            placeholder={"Enter your name"}
-            rules={{
-              required: "Name is required.",
-            }}
-          />
-
-          <CustomInput
-            control={control}
-            name={"email"}
-            placeholder={"Enter your email"}
-            rules={{
-              required: "Email is required.",
-              validate: validateEmailFormat,
-            }}
-          />
-
-          <CustomInput
-            control={control}
-            name={"password"}
-            placeholder={"Enter your password"}
-            secureTextEntry={true}
-            rules={{
-              required: "Password is required.",
-            }}
-          />
-
-          <CustomInput
-            control={control}
-            name={"confirmPassword"}
-            placeholder={"Enter your confirm password"}
-            secureTextEntry={true}
-            rules={{
-              required: "Confirm password is required.",
-              validate: validatePasswordMatch,
-            }}
-          />
-
-          <CustomInput
-            control={control}
-            name={"phone"}
-            placeholder={"Enter your phone"}
-            rules={{
-              required: "Phone is required.",
-            }}
-          />
-
-          <CustomInput
-            control={control}
-            name={"age"}
-            placeholder={"Enter your age"}
-            rules={{
-              required: "Age is required.",
-            }}
-            keyboardType={"numeric"}
-          />
-
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            data={optionGenders}
-            search
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder="Select gender"
-            searchPlaceholder="Search..."
-            value={value}
-            onChange={(item) => {
-              setValue(item.value);
-            }}
-            // renderLeftIcon={() => (
-            //   <AntDesign
-            //     style={styles.icon}
-            //     color="black"
-            //     name="Safety"
-            //     size={20}
-            //   />
-            // )}
-          />
-
-          {showPicker && (
-            <RNDateTimePicker
-              mode="date"
-              display="spinner"
-              value={date}
-              onChange={onChangeDateTimePicker}
+        <ScrollView>
+          <View>
+            <CustomInput
+              control={control}
+              name={"name"}
+              placeholder={"Enter your name"}
+              rules={{
+                required: "Name is required.",
+              }}
+              label={"Name"}
+              required={true}
             />
-          )}
 
-          {!showPicker && (
-            <Pressable onPress={toggleDatePicker}>
-              <TextInput
-                placeholder="Select date"
-                value={dateOfBirth}
-                onChangeText={changeDateOfBirth}
-                placeholderTextColor={Colors.gray}
-                editable={false}
-                onPressIn={toggleDatePicker}
+            <CustomInput
+              control={control}
+              name={"email"}
+              label={"Email"}
+              required={true}
+              placeholder={"Enter your email"}
+              // keyboardType={"email-address"}
+              rules={{
+                required: "Email is required.",
+                validate: validateEmailFormat,
+              }}
+            />
+
+            <CustomInput
+              label={"Password"}
+              control={control}
+              name={"password"}
+              placeholder={"Enter your password"}
+              secureTextEntry={true}
+              rules={{
+                required: "Password is required.",
+              }}
+              required={true}
+            />
+
+            <CustomInput
+              control={control}
+              name={"confirmPassword"}
+              label={"Confirm password"}
+              required={true}
+              placeholder={"Enter your confirm password"}
+              secureTextEntry={true}
+              rules={{
+                required: "Confirm password is required.",
+                validate: validatePasswordMatch,
+              }}
+            />
+
+            <CustomInput
+              control={control}
+              name={"phone"}
+              placeholder={"Enter your phone"}
+              rules={{
+                required: "Phone is required.",
+              }}
+              keyboardType={"numeric"}
+              label={"Phone"}
+              required={true}
+            />
+
+            <CustomInput
+              control={control}
+              name={"age"}
+              placeholder={"Enter your age"}
+              rules={{
+                required: "Age is required.",
+              }}
+              keyboardType={"numeric"}
+              label={"Age"}
+              required={true}
+            />
+
+            {/* <View>
+              <Controller>
+
+              </Controller>
+            </View> */}
+            <Dropdown
+              style={styles.dropdown}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              data={optionGenders}
+              search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder="Select gender"
+              searchPlaceholder="Search..."
+              value={value}
+              onChange={(item) => {
+                setValue(item.value);
+              }}
+            />
+
+            {showPicker && (
+              <RNDateTimePicker
+                mode="date"
+                display="spinner"
+                value={date}
+                onChange={onChangeDateTimePicker}
               />
-            </Pressable>
-          )}
+            )}
 
-          <Button
-            title="Submit"
-            onPress={handleSubmit(onSubmit)}
-            style={styles.btnSubmit}
-          />
-        </View>
+            {!showPicker && (
+              <Pressable onPress={toggleDatePicker}>
+                <TextInput
+                  placeholder="Select date"
+                  value={dateOfBirth}
+                  onChangeText={changeDateOfBirth}
+                  placeholderTextColor={Colors.gray}
+                  editable={false}
+                  onPressIn={toggleDatePicker}
+                />
+              </Pressable>
+            )}
+
+            <Button
+              title="Submit"
+              onPress={handleSubmit(onSubmit)}
+              style={styles.btnSubmit}
+            />
+          </View>
+        </ScrollView>
       </View>
     </>
   );

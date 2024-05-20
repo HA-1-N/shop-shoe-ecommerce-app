@@ -14,6 +14,7 @@ import NavigationProductDetail from "./src/navigations/NavigationProductDetail";
 import NavigationCheckout from "./src/navigations/NavigationCheckout";
 import EditProfileNavigation from "./src/navigations/EditProfileNavigation";
 import ChangePasswordNavigation from "./src/navigations/ChangePasswordNavigation";
+import OrderNavigation from "./src/navigations/OrderNavigation";
 
 const Stack = createStackNavigator();
 
@@ -57,6 +58,7 @@ export default function App() {
               name="ChangePassword"
               component={ChangePasswordNavigation}
             />
+            <Stack.Screen name="OrderNavigation" component={OrderNavigation} />
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>

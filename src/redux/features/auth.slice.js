@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getCurrentUserByIdApi } from "../../api/user.api";
 
 const initialState = {
+  userId: null,
   currentUser: null,
   authState: false,
   loading: false,
@@ -24,6 +25,9 @@ export const authSlice = createSlice({
     incrementCountNumberLogin: (state) => {
       state.countNumberLogin += 1;
     },
+    setUserId: (state, action) => {
+      state.userId = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -42,5 +46,5 @@ export const authSlice = createSlice({
   },
 });
 
-export const { incrementCountNumberLogin } = authSlice.actions;
+export const { incrementCountNumberLogin, setUserId } = authSlice.actions;
 export const authReducer = authSlice.reducer;

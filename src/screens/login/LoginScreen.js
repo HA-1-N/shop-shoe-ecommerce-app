@@ -7,7 +7,7 @@ import { validateEmailFormat } from "../../utils/common/validate.util";
 import { loginApi } from "../../api/auth.api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
-import { incrementCountNumberLogin } from "../../redux/features/auth.slice";
+import { incrementCountNumberLogin, setUserId } from "../../redux/features/auth.slice";
 
 const LoginScreen = ({navigation}) => {
 
@@ -32,6 +32,7 @@ const LoginScreen = ({navigation}) => {
         await AsyncStorage.setItem("id", res?.data?.id?.toString());
         await AsyncStorage.setItem("refreshToken", res?.data?.refreshToken);
         dispatch(incrementCountNumberLogin());  
+        dispatch(setUserId(res?.data?.id));
         navigation.navigate("NavigationBar");
       }
     } catch (error) {

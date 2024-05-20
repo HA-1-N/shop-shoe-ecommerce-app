@@ -95,6 +95,10 @@ const SettingScreen = ({ navigation }) => {
     navigation.navigate("NavigationAuth");
   }
 
+  const handleClickBtnNavigateOrder = () => {
+    navigation.navigate("OrderNavigation");
+  }
+
   const onPressClearStorage = async () => {
     await AsyncStorage.removeItem("token");
     await AsyncStorage.removeItem("id");
@@ -121,12 +125,12 @@ const SettingScreen = ({ navigation }) => {
             <View>
               <Text style={styles.greeting}>Hello, {userDetail?.name}</Text>
               <View style={styles.buttonsContainer}>
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity style={styles.button} onPress={handleClickBtnNavigateOrder}>
                   <Text style={styles.buttonText}>Your Order</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button}>
+                {/* <TouchableOpacity style={styles.button}>
                   <Text style={styles.buttonText}>Wishlist</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 {/* Add more buttons as needed */}
               </View>
             </View>
