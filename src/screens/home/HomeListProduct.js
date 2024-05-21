@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import CardCustom from "../../components/CardCustom";
 import { filterProductApi } from "../../api/product.api";
 
 const HomeListProduct = ({ navigation }) => {
-
   const [productDetails, setProductDetails] = useState([]);
+
+  console.log("productDetails", productDetails);
 
   const filterProduct = async () => {
     const body = {
@@ -66,23 +74,23 @@ const HomeListProduct = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
     marginTop: StatusBar.currentHeight || 0,
     paddingHorizontal: 10,
     // height: '100%',
   },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     padding: 10,
-    flexWrap: 'wrap',
-  },  
+    flexWrap: "wrap",
+  },
   col: {
-    width: '48%',
+    width: "48%",
     marginBottom: 10,
   },
   item: {
-    backgroundColor: '#f9c2ff',
+    backgroundColor: "#f9c2ff",
     padding: 20,
     marginVertical: 8,
     marginHorizontal: 16,
