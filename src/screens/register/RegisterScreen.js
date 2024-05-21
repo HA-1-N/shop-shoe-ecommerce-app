@@ -19,8 +19,13 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import { optionGenders } from "../../utils/data.util";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
+import { registerApi } from "../../api/auth.api";
+import { useNavigation } from "@react-navigation/native";
 
 const RegisterScreen = () => {
+
+  const navigation = useNavigation();
+
   const [value, setValue] = useState(null);
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
@@ -47,6 +52,7 @@ const RegisterScreen = () => {
     const date = new Date(rawDate);
 
     return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+    // return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
   };
 
   const onChangeDateTimePicker = (event, selectedDate) => {
@@ -65,9 +71,30 @@ const RegisterScreen = () => {
 
   const changeDateOfBirth = (event, selectedDate) => {};
 
+  const onSubmit = async (data) =>{
 
+    const formData = new FormData();
 
-  const onSubmit = (data) => console.log(data);
+    const newValues = {
+      ...data,
+      gender: value,
+      dateOfBirth: dateOfBirth,
+      roleIds: [2],
+      prefix: "+84",
+    };
+
+    formData.append('data', new Blob([JSON.stringify(newValues)], { type: 'application/json' }));
+    registerApi(formData)
+      .then((res) => {
+        console.log(res);
+        if (res.status === 200) {
+          navigation.navigate("Login");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 
   return (
     <>
