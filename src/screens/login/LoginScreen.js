@@ -27,13 +27,16 @@ const LoginScreen = ({navigation}) => {
   const onSubmit = async (data) => {
     try {
       const res = await loginApi(data);
-      if (res) {
+      const getRoleCode = res?.data?.roles?.map((role) => role.code);
+      if (res && getRoleCode.includes("USER")) {
         await AsyncStorage.setItem("token", res?.data?.token);
         await AsyncStorage.setItem("id", res?.data?.id?.toString());
         await AsyncStorage.setItem("refreshToken", res?.data?.refreshToken);
         dispatch(incrementCountNumberLogin());  
         dispatch(setUserId(res?.data?.id));
         navigation.navigate("NavigationBar");
+      } else {
+        alert("Account not account user!");
       }
     } catch (error) {
       console.log("error", error);
