@@ -3,8 +3,14 @@ import { useForm } from "react-hook-form";
 import { Button, StyleSheet, Text, View } from "react-native";
 import CustomInput from "../../components/CustomInput";
 import { validateNewPasswordMatch, validatePasswordMatch } from "../../utils/common/validate.util";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { changePasswordApi } from "../../api/auth.api";
+import { useNavigation } from "@react-navigation/native";
 
-const ChangePasswordScreen = ({ navigation }) => {
+const ChangePasswordScreen = () => {
+
+  const navigation = useNavigation();
+
   const {
     control,
     handleSubmit,
@@ -17,7 +23,30 @@ const ChangePasswordScreen = ({ navigation }) => {
     },
   });
 
-  const onSubmit = (data) => console.log(data);
+  const buildBody = async (values) => {
+    const userId = await AsyncStorage.getItem("id");
+    // console.log("userId", userId);
+    const newValues = {
+      ...values,
+      id: Number(userId),
+    };
+    return newValues;
+  }
+
+  const onSubmit = (data) => {
+    const body = buildBody(data);
+    // Add your change password logic here
+    changePasswordApi(body)
+      .then((res) => {
+        if (res.status === 200) {
+          navigation.navigate("NavigationBar");
+          alert("Change password successfully");
+        }
+      })
+      .catch((error) => {
+        console.log("Error changing password", error);
+      });
+  };
 
   return (
     <View style={styles.container}>

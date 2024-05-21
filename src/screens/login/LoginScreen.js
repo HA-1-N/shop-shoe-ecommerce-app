@@ -4,8 +4,15 @@ import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import CustomInput from "../../components/CustomInput";
 import { validateEmailFormat } from "../../utils/common/validate.util";
+import { loginApi } from "../../api/auth.api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+import { incrementCountNumberLogin, setUserId } from "../../redux/features/auth.slice";
 
 const LoginScreen = ({navigation}) => {
+
+  const dispatch = useDispatch();
+
   const {
     control,
     handleSubmit,
@@ -17,7 +24,24 @@ const LoginScreen = ({navigation}) => {
     },
   });
 
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = async (data) => {
+    try {
+      const res = await loginApi(data);
+      const getRoleCode = res?.data?.roles?.map((role) => role.code);
+      if (res && getRoleCode.includes("USER")) {
+        await AsyncStorage.setItem("token", res?.data?.token);
+        await AsyncStorage.setItem("id", res?.data?.id?.toString());
+        await AsyncStorage.setItem("refreshToken", res?.data?.refreshToken);
+        dispatch(incrementCountNumberLogin());  
+        dispatch(setUserId(res?.data?.id));
+        navigation.navigate("NavigationBar");
+      } else {
+        alert("Account not account user!");
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
 
   const handleClickSignUp = () => {
     navigation.navigate("Register");

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -11,19 +11,42 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import Carousel from "react-native-reanimated-carousel";
 import Colors from "../../utils/common/color.ultil";
 import { getProductByIdApi } from "../../api/product.api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { addToCartApi } from "../../api/cart.api";
+import { useDispatch } from "react-redux";
+import { incrementCart } from "../../redux/features/cart.slice";
 
-const ProductDetailScreen = ({ route }) => {
+const ProductDetailScreen = ({ route, navigation }) => {
   const { id } = route.params;
+
+  const dispatch = useDispatch();
 
   const [productDetail, setProductDetail] = useState({});
   const [listColor, setListColor] = useState([]);
   const [listSizeColor, setListSizeColor] = useState([]);
   const [listProductImage, setListProductImage] = useState([]);
   const [productQuantitiesDetail, setProductQuantitiesDetail] = useState([]);
+  const [idStorage, setIdStorage] = useState(null);
 
   const [selectedColor, setSelectedColor] = useState({});
   const [selectedSize, setSelectedSize] = useState({});
   const [quantity, setQuantity] = useState(1);
+
+  const getIdLocalStorage = async () => {
+    try {
+      const value = await AsyncStorage.getItem("id");
+      if (value !== null) {
+        console.log("value", value);
+        setIdStorage(Number(value));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getIdLocalStorage();
+  }, []);
 
   const getProductById = async () => {
     try {
@@ -97,14 +120,77 @@ const ProductDetailScreen = ({ route }) => {
   };
 
   const handleColorChange = (color) => {
-    const getListImage = getImagesBySizeAndColor(productQuantitiesDetail, selectedSize, color);
+    const getListImage = getImagesBySizeAndColor(
+      productQuantitiesDetail,
+      selectedSize,
+      color
+    );
     setListProductImage(getListImage.map((item) => item?.url));
     setSelectedColor(color);
+    const sizeColorArr = productQuantitiesDetail?.map((item) => ({
+      size: item?.size,
+      color: item?.color,
+    }));
+    const transformedDataSizeColor = sizeColorArr.reduce((acc, item) => {
+      const existingItem = acc.find((i) => i.color.id === item.color.id);
+
+      if (existingItem) {
+        existingItem.size.push(item.size);
+      } else {
+        acc.push({
+          color: item.color,
+          size: [item.size],
+        });
+      }
+
+      return acc;
+    }, []);
+
+    const getSizeByColor = transformedDataSizeColor
+      ?.filter((item) => item.color.id === color.id)
+      ?.map((item) => item.size)
+      ?.flat();
+
+    setSelectedSize(getSizeByColor[0]);
   };
 
   const handleSizeChange = (size) => {
     setSelectedSize(size);
   };
+
+  const handleAddToCart = () => {
+    if (idStorage !== null) {
+      // Add to cart
+      const product = {
+        userId: Number(idStorage),
+        productId: Number(productDetail?.id),
+        quantity: quantity,
+        colorId: selectedColor?.id,
+        sizeId: selectedSize?.id,
+      };
+      addToCartApi(product).then((response) => {
+        console.log("response", response);
+        if (response.status === 200) {
+          dispatch(incrementCart());
+          alert("Add to cart successfully");
+          navigation.navigate("Cart");
+        }
+      });
+    } else {
+      // Redirect to login
+      navigation.navigate("NavigationAuth");
+    }
+  };
+
+  const incrementQuantity = useCallback(() => {
+    setQuantity(prevQuantity => prevQuantity + 1);
+  }, []);
+
+  const decrementQuantity = useCallback(() => {
+    setQuantity((prevQuantity) =>
+      prevQuantity > 1 ? prevQuantity - 1 : prevQuantity
+    );
+  }, []);
 
   const width = Dimensions.get("window").width;
 
@@ -169,17 +255,17 @@ const ProductDetailScreen = ({ route }) => {
               {listColor.map((color, index) => (
                 <TouchableOpacity
                   key={index}
-                  onPress={() => handleColorChange(color.code)}
+                  onPress={() => handleColorChange(color)}
                   style={{
                     width: 30,
                     height: 30,
                     borderRadius: 20,
-                    backgroundColor: color.code,
+                    backgroundColor: color?.code,
                     marginRight: 10,
-                    borderWidth: selectedColor === color.code ? 6 : 0,
+                    borderWidth: selectedColor?.code === color.code ? 6 : 2,
                     borderColor:
                       color.code === Colors.black
-                        ? Colors.white
+                        ? Colors.border
                         : "rgba(0, 0, 0, 0.2)",
                   }}
                 />
@@ -245,11 +331,7 @@ const ProductDetailScreen = ({ route }) => {
                   borderRadius: 5,
                   marginRight: 10,
                 }}
-                onPress={() => {
-                  if (quantity > 1) {
-                    setQuantity(quantity - 1);
-                  }
-                }}
+                onPress={decrementQuantity}
               >
                 <Text
                   style={{ color: "#FFF", textAlign: "center", fontSize: 16 }}
@@ -270,9 +352,7 @@ const ProductDetailScreen = ({ route }) => {
               >
                 <Text
                   style={{ color: "#FFF", textAlign: "center", fontSize: 16 }}
-                  onPress={() => {
-                    setQuantity(quantity + 1);
-                  }}
+                  onPress={incrementQuantity}
                 >
                   +
                 </Text>
@@ -308,6 +388,7 @@ const ProductDetailScreen = ({ route }) => {
             borderRadius: 5,
             alignItems: "center",
           }}
+          onPress={handleAddToCart}
         >
           <Text style={{ color: "#FFF", fontWeight: "bold" }}>Add to cart</Text>
         </TouchableOpacity>

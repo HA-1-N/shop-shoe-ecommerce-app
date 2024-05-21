@@ -1,68 +1,83 @@
-import React from 'react'
-import { Button, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { Button, RefreshControl, StyleSheet, Text, View } from 'react-native'
 import CardCartCustom from '../../components/CardCartCustom';
 import { ScrollView } from 'react-native-gesture-handler';
-
-const data = [
-  {
-    id: 1,
-    name: "Product 1",
-    price: 100,
-    quantity: 1,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 2,
-    name: "Product 2",
-    price: 200,
-    quantity: 2,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 3,
-    name: "Product 3",
-    price: 300,
-    quantity: 2,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 4,
-    name: "Product 3",
-    price: 300,
-    quantity: 2,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 5,
-    name: "Product 3",
-    price: 300,
-    quantity: 2,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 6,
-    name: "Product 3",
-    price: 300,
-    quantity: 2,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 7,
-    name: "Product 3",
-    price: 300,
-    quantity: 2,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 8,
-    name: "Product 113",
-    price: 300,
-    quantity: 2,
-    image: "https://via.placeholder.com/150",
-  },
-];
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getCartItemApi, removeCartItemApi } from '../../api/cart.api';
+import { useDispatch, useSelector } from 'react-redux';
+import { incrementCart } from '../../redux/features/cart.slice';
 
 const CartScreen = ({ navigation }) => {
+
+  const dispatch = useDispatch();
+
+  const countCartIncrement = useSelector((state) => state.cart.countCartIncrement);
+
+  const [userId, setUserId] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefresh(true);
+    dispatch(incrementCart());
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  }, []);
+
+  const getIdLocalStorage = async () => {
+    // Add your get id logic here
+    try {
+      const id = await AsyncStorage.getItem("id");
+      setUserId(Number(id));
+    } catch (error) {
+      console.log("Error getting user id", error);
+    }
+  };
+
+  useEffect(() => {
+    getIdLocalStorage();
+  }, []);
+
+  const getCartItems = async () => {
+    // Add your get cart items logic here
+    try {
+      const response = await getCartItemApi(Number(userId));
+      setCartItems(response.data);
+    } catch (error) {
+      console.log("Error getting cart items", error);
+    }
+  };
+
+  useEffect(() => {
+    getCartItems();
+  }, [userId, countCartIncrement]);
+
+  const total = cartItems?.reduce((acc, item) => {
+    return acc + item.product.price * item.quantity;
+  }, 0);
+
+  const handleNavigateProductDetail = (id) => {
+    navigation.navigate("NavigationProductDetail", { id: id });
+  };
+
+  const handleRemoveCartItem = async (cartItemId) => {
+    // Add your remove cart item logic here
+    if (!cartItemId) {
+      return;
+    }
+
+    try {
+      const res = await removeCartItemApi({ cartItemId });
+      if (res.status === 200) {
+      dispatch(incrementCart());
+       alert("Remove cart item successfully");
+      }
+    } catch (error) {
+      console.log("Error removing cart item", error);
+    }
+  }
+
   return (
     <View>
       <ScrollView
@@ -70,21 +85,35 @@ const CartScreen = ({ navigation }) => {
         contentInsetAdjustmentBehavior="automatic"
         alwaysBounceVertical={true}
         snapToEnd={true}
+        refreshControl={
+          <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
+        }
       >
         <View>
-          {data.map((item) => (
+          {cartItems.map((item) => (
             <CardCartCustom
               key={item.id}
-              productName={item.name}
-              price={item.price}
-              quantity={item.quantity}
-              image={item.image}
+              cartItemId={item.id}
+              productId={item?.product?.id}
+              productName={item?.product?.name}
+              price={item?.product?.price}
+              quantity={item?.quantity}
+              image={item?.productImage?.image}
+              handleNavigateProductDetail={handleNavigateProductDetail}
+              handleRemoveCartItem={handleRemoveCartItem}
             />
           ))}
         </View>
+
         <View style={styles.wrapBox}>
+          <Text style={{ fontSize: 18, fontWeight: 600, marginBottom: 10 }}>
+            Total Orders
+          </Text>
+          <Text style={{ fontSize: 16, fontWeight: 600, marginBottom: 10 }}>
+            {cartItems?.length} products
+          </Text>
           <Text style={styles.title}>
-            Total: <Text style={styles.content}>1000$</Text>
+            Total: <Text style={styles.content}>{total?.toLocaleString("en-US")} VND</Text>
           </Text>
         </View>
 
@@ -92,18 +121,15 @@ const CartScreen = ({ navigation }) => {
 
         <View style={styles.wrapBox}>
           <Text style={styles.title}>
-            Shipping Fee: <Text style={styles.content}>10$</Text>
-          </Text>
-        </View>
-
-        <View style={styles.line}></View>
-
-        <View style={styles.wrapBox}>
-          <Text style={styles.title}>
-            Total Payment: <Text style={styles.content}>1010$</Text>
+            Total Payment: <Text style={styles.content}>{total?.toLocaleString("en-US")} VND</Text>
           </Text>
           <View style={styles.btn}>
-            <Button title="Checkout" onPress={() => {navigation.navigate("NavigationCheckout");}} />
+            <Button
+              title="Checkout"
+              onPress={() => {
+                navigation.navigate("NavigationCheckout");
+              }}
+            />
           </View>
         </View>
       </ScrollView>

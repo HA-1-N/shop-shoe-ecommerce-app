@@ -5,8 +5,7 @@ import { useRoute } from '@react-navigation/native';
 
 const DetailStack = createStackNavigator();
 
-const NavigationProductDetail = () => {
-
+const NavigationProductDetail = ({ navigator }) => {
   const route = useRoute();
 
   return (
