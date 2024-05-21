@@ -16,8 +16,6 @@ const HomeListProduct = ({ navigation }) => {
   const [refresh, setRefresh] = useState(false);
   const [countProduct, setCountProduct] = useState(0);
 
-  console.log("productDetails", productDetails);
-
   const filterProduct = async () => {
     const body = {
       name: null,
