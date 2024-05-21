@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Colors from '../utils/common/color.ultil';
 
 const CardCartCustom = ({
+  image,
   productId,
   productName,
   cartItemId,
@@ -22,7 +23,7 @@ const CardCartCustom = ({
           <Image
             style={styles.image}
             source={{
-              uri: "https://product.hstatic.net/200000410665/product/dsc00591_2a3d11abbdeb4df88c43b4eed8d61591.jpg",
+              uri: image,
             }}
           />
         </TouchableOpacity>

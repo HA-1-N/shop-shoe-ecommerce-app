@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
 import CardOrderItem from "../../components/CardOrderItem";
 import { getOrderByUserIdApi } from "../../api/order.api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 
 const OrderScreen = () => {
-
   const navigation = useNavigation();
 
   const [orderByUserItems, setOrderByUserItems] = useState([]);
   const [userId, setUserId] = useState(null);
+  const [refresh, setRefresh] = useState(false);
+  const [count, setCount] = useState(0);
 
   const getIdLocalStorage = async () => {
     // Add your get id logic here
@@ -25,7 +26,6 @@ const OrderScreen = () => {
   useEffect(() => {
     getIdLocalStorage();
   }, []);
-
 
   const getOrderByUserId = async () => {
     try {
@@ -42,7 +42,15 @@ const OrderScreen = () => {
 
   const handleNavigationOrderDetail = (id) => {
     navigation.navigate("Order Detail", { id: id });
-  }
+  };
+
+  const onRefresh = React.useCallback(() => {
+    setRefresh(true);
+    setCount(count + 1);
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  }, []);
 
   return (
     <View>
@@ -51,6 +59,9 @@ const OrderScreen = () => {
         contentInsetAdjustmentBehavior="automatic"
         alwaysBounceVertical={true}
         snapToEnd={true}
+        refreshControl={
+          <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
+        }
       >
         <View>
           {orderByUserItems?.map((item, index) => (

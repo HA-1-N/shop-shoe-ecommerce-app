@@ -8,6 +8,7 @@ const CardOrderDetail = ({
     quantity,
     colorText,
     size,
+    image,
     ...props
 }) => {
   return (
@@ -17,12 +18,12 @@ const CardOrderDetail = ({
           <Image
             style={styles.image}
             source={{
-              uri: "https://product.hstatic.net/200000410665/product/dsc00591_2a3d11abbdeb4df88c43b4eed8d61591.jpg",
+              uri: image,
             }}
           />
         </TouchableOpacity>
 
-        <View>
+        <View style={{ marginHorizontal: 10 }}>
           <Text style={styles.text}>{productName}</Text>
           <View style={styles.wrap}>
             <Text style={styles.text}>Price: </Text>

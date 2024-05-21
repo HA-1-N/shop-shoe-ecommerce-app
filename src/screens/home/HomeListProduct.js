@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
+import { FlatList, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
 import CardCustom from "../../components/CardCustom";
 import { filterProductApi } from "../../api/product.api";
 
 const HomeListProduct = ({ navigation }) => {
 
   const [productDetails, setProductDetails] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+  const [countProduct, setCountProduct] = useState(0);
 
   const filterProduct = async () => {
     const body = {
@@ -32,17 +34,29 @@ const HomeListProduct = ({ navigation }) => {
 
   useEffect(() => {
     filterProduct();
-  }, []);
+  }, [countProduct]);
 
   const handleNavigateProductDetail = (id) => {
     navigation.navigate("NavigationProductDetail", { id: id });
   };
+
+  const onRefresh = React.useCallback(() => {
+    setRefresh(true);
+    setCountProduct(countProduct + 1);
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  }, []);
+
   return (
     <ScrollView
       contentContainerStyle={{ paddingBottom: 120 }}
       contentInsetAdjustmentBehavior="automatic"
       alwaysBounceVertical={true}
       snapToEnd={true}
+      refreshControl={
+        <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
+      }
     >
       <View style={styles.container}>
         <View style={styles.row}>

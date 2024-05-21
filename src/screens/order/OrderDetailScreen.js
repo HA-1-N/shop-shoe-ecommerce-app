@@ -36,6 +36,7 @@ const OrderDetailScreen = () => {
             orderDetail?.orderProducts?.map((item, index) => (
               <CardOrderDetail
                 key={index}
+                image={item?.product?.productImages[0]?.url}
                 productName={item?.product?.name}
                 price={item?.product?.price}
                 quantity={item?.quantity}

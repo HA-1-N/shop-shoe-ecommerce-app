@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, StyleSheet, Text, View } from 'react-native'
+import { Button, RefreshControl, StyleSheet, Text, View } from 'react-native'
 import CardCartCustom from '../../components/CardCartCustom';
 import { ScrollView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,6 +15,15 @@ const CartScreen = ({ navigation }) => {
 
   const [userId, setUserId] = useState(null);
   const [cartItems, setCartItems] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefresh(true);
+    dispatch(incrementCart());
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  }, []);
 
   const getIdLocalStorage = async () => {
     // Add your get id logic here
@@ -76,6 +85,9 @@ const CartScreen = ({ navigation }) => {
         contentInsetAdjustmentBehavior="automatic"
         alwaysBounceVertical={true}
         snapToEnd={true}
+        refreshControl={
+          <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
+        }
       >
         <View>
           {cartItems.map((item) => (
@@ -86,7 +98,7 @@ const CartScreen = ({ navigation }) => {
               productName={item?.product?.name}
               price={item?.product?.price}
               quantity={item?.quantity}
-              image={item.image}
+              image={item?.productImage?.image}
               handleNavigateProductDetail={handleNavigateProductDetail}
               handleRemoveCartItem={handleRemoveCartItem}
             />
@@ -95,7 +107,7 @@ const CartScreen = ({ navigation }) => {
 
         <View style={styles.wrapBox}>
           <Text style={{ fontSize: 18, fontWeight: 600, marginBottom: 10 }}>
-            Tổng đơn hàng
+            Total Orders
           </Text>
           <Text style={{ fontSize: 16, fontWeight: 600, marginBottom: 10 }}>
             {cartItems?.length} products
