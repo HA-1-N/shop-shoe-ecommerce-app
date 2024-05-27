@@ -169,7 +169,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
         sizeId: selectedSize?.id,
       };
       addToCartApi(product).then((response) => {
-        console.log("response", response);
+        // console.log("response", response);
         if (response.status === 200) {
           dispatch(incrementCart());
           alert("Add to cart successfully");

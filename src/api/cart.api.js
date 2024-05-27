@@ -19,3 +19,7 @@ export const getCountCartApi = (userId) => {
 export const clearCartApi = (userId) => {
   return HTTP_SERVICE.delete(`/cart/clear-cart/${userId}`);
 };
+
+export const updateCartItemApi = (data) => {
+  return HTTP_SERVICE.post(`/cart/update-cart`, data);
+};

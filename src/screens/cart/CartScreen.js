@@ -17,9 +17,13 @@ const CartScreen = ({ navigation }) => {
   const [cartItems, setCartItems] = useState([]);
   const [refresh, setRefresh] = useState(false);
 
+  const incrementCountCart = () => {
+    dispatch(incrementCart());
+  }
+
   const onRefresh = React.useCallback(() => {
     setRefresh(true);
-    dispatch(incrementCart());
+    incrementCountCart();
     setTimeout(() => {
       setRefresh(false);
     }, 2000);
@@ -70,7 +74,7 @@ const CartScreen = ({ navigation }) => {
     try {
       const res = await removeCartItemApi({ cartItemId });
       if (res.status === 200) {
-      dispatch(incrementCart());
+        incrementCountCart();
        alert("Remove cart item successfully");
       }
     } catch (error) {
@@ -99,8 +103,12 @@ const CartScreen = ({ navigation }) => {
               price={item?.product?.price}
               quantity={item?.quantity}
               image={item?.productImage?.image}
+              color={item?.color?.name}
+              size={item?.size?.name}
               handleNavigateProductDetail={handleNavigateProductDetail}
               handleRemoveCartItem={handleRemoveCartItem}
+              userId={userId}
+              incrementCountCart={incrementCountCart}
             />
           ))}
         </View>
