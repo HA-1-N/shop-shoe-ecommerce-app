@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Button,
+  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -21,6 +22,7 @@ import { optionGenders } from "../../utils/data.util";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { registerApi } from "../../api/auth.api";
 import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
 
 const RegisterScreen = () => {
 
@@ -29,7 +31,9 @@ const RegisterScreen = () => {
   const [value, setValue] = useState(null);
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
-  const [dateOfBirth, setDateOfBirth] = useState(new Date());
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [image, setImage] = useState(null);
+  console.log("image", image);
 
   const {
     control,
@@ -44,6 +48,22 @@ const RegisterScreen = () => {
     },
   });
 
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
   const toggleDatePicker = () => {
     setShowPicker(!showPicker);
   };
@@ -51,8 +71,8 @@ const RegisterScreen = () => {
   const formatDate = (rawDate) => {
     const date = new Date(rawDate);
 
-    return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
-    // return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    // return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   };
 
   const onChangeDateTimePicker = (event, selectedDate) => {
@@ -69,7 +89,9 @@ const RegisterScreen = () => {
     }
   };
 
-  const changeDateOfBirth = (event, selectedDate) => {};
+  const changeDateOfBirth = (event, selectedDate) => {
+    // console.log("selectedDate", selectedDate);
+  };
 
   const onSubmit = async (data) =>{
 
@@ -83,17 +105,26 @@ const RegisterScreen = () => {
       prefix: "+84",
     };
 
+    console.log("newValues", newValues);
+
     formData.append('data', new Blob([JSON.stringify(newValues)], { type: 'application/json' }));
-    registerApi(formData)
-      .then((res) => {
-        console.log(res);
-        if (res.status === 200) {
-          navigation.navigate("Login");
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    
+    const filename = image.split('/').pop();
+    console.log("filename", filename);
+    const match = /\.(\w+)$/.exec(filename);
+    const type = match ? `image/${match[1]}` : `image`;
+
+    console.log("type", type);
+    // registerApi(formData)
+    //   .then((res) => {
+    //     console.log(res);
+    //     if (res.status === 200) {
+    //       navigation.navigate("Login");
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   }
 
   return (
@@ -208,7 +239,13 @@ const RegisterScreen = () => {
               />
             )}
 
-            {!showPicker && (
+            {/* {showPicker && } */}
+
+            {/* {!showPicker && ( */}
+            <View>
+              <Text style={styles.label}>
+                {"Date Of birth"} {<Text style={styles.required}>*</Text>}
+              </Text>
               <Pressable onPress={toggleDatePicker}>
                 <TextInput
                   placeholder="Select date"
@@ -217,9 +254,19 @@ const RegisterScreen = () => {
                   placeholderTextColor={Colors.gray}
                   editable={false}
                   onPressIn={toggleDatePicker}
+                  style={styles.input}
                 />
               </Pressable>
-            )}
+            </View>
+            {/* )} */}
+
+            <View style={styles.container}>
+              <Button
+                title="Pick an image from camera roll"
+                onPress={pickImage}
+              />
+              {image && <Image source={{ uri: image }} style={styles.image} />}
+            </View>
 
             <Button
               title="Submit"
@@ -279,6 +326,29 @@ const styles = StyleSheet.create({
   inputSearchStyle: {
     height: 40,
     fontSize: 16,
+  },
+  image: {
+    width: "100%", // Full width
+    height: 300,
+    resizeMode: "contain",
+    marginTop: 20,
+  },
+  input: {
+    height: 40,
+    backgroundColor: Colors.white,
+    borderBottomColor: Colors.gray,
+    borderBottomWidth: 0.5,
+    marginBottom: 20,
+    padding: 10,
+    color: Colors.black,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: Colors.grey,
+  },
+  required: {
+    color: Colors.danger,
   },
 });
 
