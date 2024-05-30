@@ -82,6 +82,14 @@ const CartScreen = ({ navigation }) => {
     }
   }
 
+  const handleCheckout = () => {  
+    if (cartItems.length === 0) {
+      alert("Cart is empty");
+    } else {
+      navigation.navigate("NavigationCheckout");
+    }
+  }
+
   return (
     <View>
       <ScrollView
@@ -134,9 +142,7 @@ const CartScreen = ({ navigation }) => {
           <View style={styles.btn}>
             <Button
               title="Checkout"
-              onPress={() => {
-                navigation.navigate("NavigationCheckout");
-              }}
+              onPress={handleCheckout}
             />
           </View>
         </View>

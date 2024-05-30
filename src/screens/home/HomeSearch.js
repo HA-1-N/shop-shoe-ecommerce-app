@@ -1,30 +1,52 @@
 import Slider from "@react-native-community/slider";
-import React, { useEffect, useState } from "react";
-import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getAllCategoryApi } from "../../api/category.api";
 import { getAllBrandApi } from "../../api/brand.api";
 import { getAllSizeApi } from "../../api/size.api";
 import { getAllColorApi } from "../../api/color.api";
+import Colors from "../../utils/common/color.ultil";
 
-const HomeSearch = () => {
+
+const HomeSearch = ({ getProduct, page }) => {
   const dispatch = useDispatch();
+
+  const initialFormSearch = {
+    name: null,
+    status: null,
+    brandId: null,
+    categoryId: null,
+    colorId: null,
+    sizeId: null,
+    maxPrice: 3000000,
+    minPrice: 0,
+  };
+
+  const queryParams = {
+    page: page - 1,
+    size: 16,
+  };
 
   const [search, setSearch] = useState("");
   const [isOpenFilter, setIsOpenFilter] = useState(false);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
-  const [priceRange, setPriceRange] = useState([0, 2500000]);
-  
+  const [selectedBrand, setSelectedBrand] = useState(null);
+  const [priceRange, setPriceRange] = useState([0, 3000000]);
+
   const [listSize, setListSize] = useState([]);
   const [listColor, setListColor] = useState([]);
   const [listBrand, setListBrand] = useState([]);
   const [listCategory, setListCategory] = useState([]);
- 
-  const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
-  const colors = ['#00bfff', '#ff4500', '#800080', '#ff1493'];
-  const brands = ['HasThemes', 'HasTech', 'Bootxperts', 'Codecarnival'];
 
   const getAllCategory = async () => {
     try {
@@ -73,10 +95,20 @@ const HomeSearch = () => {
     setIsOpenFilter(!isOpenFilter);
   };
 
-  const handleSearch = (text) => {
+  const handleSearch = useCallback((text) => {
     setSearch(text);
-    // dispatch({ type: "SEARCH", payload: text });
-  };
+    const newVales = {
+      name: text,
+      status: null,
+      brandId: selectedBrand ? selectedBrand?.id : null,
+      categoryId: null,
+      colorId: selectedColor ? [selectedColor?.id] : null,
+      sizeId: selectedSize ? [selectedSize?.id] : null,
+      maxPrice: priceRange[1],
+      minPrice: priceRange[0],
+    };
+    getProduct(newVales, queryParams);
+  }, [search]);
 
   const handleSizeChange = (size) => {
     setSelectedSize(size);
@@ -86,11 +118,34 @@ const HomeSearch = () => {
     setSelectedColor(color);
   };
 
+  const handleBrandChange = (brand) => {
+    setSelectedBrand(brand);
+  };
+
+  const handleSubmit = () => {
+    const body = {
+      name: search ? search : null,
+      status: null,
+      brandId: selectedBrand ? selectedBrand?.id : null,
+      categoryId: null,
+      colorId: selectedColor ? [selectedColor?.id] : null,
+      sizeId: selectedSize ? [selectedSize?.id] : null,
+      maxPrice: priceRange[1],
+      minPrice: priceRange[0],
+    };
+    console.log(body);
+    getProduct(body, queryParams);
+    setIsOpenFilter(false);
+  };
+
   const handleCancel = () => {
     setIsOpenFilter(false);
+    setSearch("");
     setSelectedSize(null);
     setSelectedColor(null);
-    setPriceRange([0, 2500000]);
+    setSelectedBrand(null);
+    setPriceRange([0, 3000000]);
+    getProduct(initialFormSearch, queryParams);
   };
 
   return (
@@ -141,7 +196,7 @@ const HomeSearch = () => {
             {/* Size */}
             <Text style={styles.label}>Size</Text>
             <View style={styles.sizeContainer}>
-              {sizes.map((size, index) => (
+              {listSize.map((size, index) => (
                 <TouchableOpacity
                   key={index}
                   onPress={() => handleSizeChange(size)}
@@ -156,7 +211,7 @@ const HomeSearch = () => {
                       selectedSize === size && styles.selectedSizeText,
                     ]}
                   >
-                    {size}
+                    {size?.name}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -165,13 +220,13 @@ const HomeSearch = () => {
             {/* Color */}
             <Text style={styles.label}>Color</Text>
             <View style={styles.colorContainer}>
-              {colors.map((color, index) => (
+              {listColor.map((color, index) => (
                 <TouchableOpacity
                   key={index}
                   onPress={() => handleColorChange(color)}
                   style={[
                     styles.colorBox,
-                    { backgroundColor: color },
+                    { backgroundColor: color?.code },
                     selectedColor === color && styles.selectedColorBox,
                   ]}
                 />
@@ -181,17 +236,31 @@ const HomeSearch = () => {
             {/* Brands */}
             <Text style={styles.label}>Brand</Text>
             <View style={styles.brandContainer}>
-              {brands.map((brand, index) => (
-                <Text key={index} style={styles.brandText}>
-                  {brand}
-                </Text>
+              {listBrand.map((brand, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => handleBrandChange(brand)}
+                  style={[
+                    styles.sizeBox,
+                    selectedBrand === brand && styles.selectedSizeBox,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.sizeText,
+                      selectedBrand === brand && styles.selectedSizeText,
+                    ]}
+                  >
+                    {brand?.name}
+                  </Text>
+                </TouchableOpacity>
               ))}
             </View>
 
             {/* Buttons */}
             <View style={styles.buttonContainer}>
-              <Button title="APPLY" onPress={() => {}} color="#007bff" />
-              <Button title="CANCEL" onPress={() => {}} color="#6c757d" />
+              <Button title="APPLY" onPress={handleSubmit} color="#007bff" />
+              <Button title="CANCEL" onPress={handleCancel} color="#6c757d" />
             </View>
           </View>
         )}
@@ -212,7 +281,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   wrapFilter: {
-    padding: 20
+    padding: 20,
   },
   input: {
     backgroundColor: "white",
@@ -233,12 +302,12 @@ const styles = StyleSheet.create({
 
   label: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 10,
   },
   sliderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   slider: {
     flex: 1,
@@ -246,31 +315,31 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     width: 40,
-    textAlign: 'center',
+    textAlign: "center",
   },
   sizeContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     marginVertical: 10,
   },
   sizeBox: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     padding: 10,
     margin: 5,
     borderRadius: 5,
   },
   selectedSizeBox: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
   },
   sizeText: {
-    color: '#000',
+    color: "#000",
   },
   selectedSizeText: {
-    color: '#fff',
+    color: "#fff",
   },
   colorContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginVertical: 10,
   },
   colorBox: {
@@ -278,14 +347,16 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
     margin: 5,
+    borderColor: Colors.border,
+    borderWidth: 2,
   },
   selectedColorBox: {
-    borderWidth: 2,
-    borderColor: '#000',
+    borderWidth: 6,
+    // borderColor: '#000',
   },
   brandContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     marginVertical: 10,
   },
   brandText: {
@@ -293,8 +364,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 20,
   },
 });

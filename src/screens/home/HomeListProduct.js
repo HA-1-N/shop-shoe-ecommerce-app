@@ -9,39 +9,13 @@ import {
   View,
 } from "react-native";
 import CardCustom from "../../components/CardCustom";
-import { filterProductApi } from "../../api/product.api";
+import { useNavigation } from "@react-navigation/native";
 
-const HomeListProduct = ({ navigation }) => {
-  const [productDetails, setProductDetails] = useState([]);
+const HomeListProduct = ({ productDetails, getProduct, initalValues, queryParams }) => {
+
+  const navigation = useNavigation();
+
   const [refresh, setRefresh] = useState(false);
-  const [countProduct, setCountProduct] = useState(0);
-
-  const filterProduct = async () => {
-    const body = {
-      name: null,
-      status: null,
-      brandId: null,
-      categoryId: null,
-      colorId: null,
-      sizeId: null,
-      maxPrice: null,
-      minPrice: null,
-    };
-    const params = {
-      page: 0,
-      size: 10,
-    };
-    try {
-      const response = await filterProductApi(body, params);
-      setProductDetails(response?.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    filterProduct();
-  }, [countProduct]);
 
   const handleNavigateProductDetail = (id) => {
     navigation.navigate("NavigationProductDetail", { id: id });
@@ -49,7 +23,7 @@ const HomeListProduct = ({ navigation }) => {
 
   const onRefresh = React.useCallback(() => {
     setRefresh(true);
-    setCountProduct(countProduct + 1);
+    getProduct(initalValues, queryParams);
     setTimeout(() => {
       setRefresh(false);
     }, 2000);
@@ -70,6 +44,7 @@ const HomeListProduct = ({ navigation }) => {
           {productDetails?.map((item, index) => (
             <View key={index} style={styles.col}>
               <CardCustom
+                key={index}
                 id={item?.id}
                 handleNavigateProductDetail={handleNavigateProductDetail}
                 imageUrl={item?.productImages[0]?.url}
