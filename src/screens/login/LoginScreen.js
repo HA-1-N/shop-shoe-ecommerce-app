@@ -1,16 +1,18 @@
 import React from "react";
 import Colors from "../../utils/common/color.ultil";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import CustomInput from "../../components/CustomInput";
 import { validateEmailFormat } from "../../utils/common/validate.util";
 import { loginApi } from "../../api/auth.api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
-import { incrementCountNumberLogin, setUserId } from "../../redux/features/auth.slice";
+import {
+  incrementCountNumberLogin,
+  setUserId,
+} from "../../redux/features/auth.slice";
 
-const LoginScreen = ({navigation}) => {
-
+const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const {
@@ -32,7 +34,7 @@ const LoginScreen = ({navigation}) => {
         await AsyncStorage.setItem("token", res?.data?.token);
         await AsyncStorage.setItem("id", res?.data?.id?.toString());
         await AsyncStorage.setItem("refreshToken", res?.data?.refreshToken);
-        dispatch(incrementCountNumberLogin());  
+        dispatch(incrementCountNumberLogin());
         dispatch(setUserId(res?.data?.id));
         navigation.navigate("NavigationBar");
       } else {
@@ -40,11 +42,16 @@ const LoginScreen = ({navigation}) => {
       }
     } catch (error) {
       console.log("error", error);
+      alert("Email or password is incorrect.");
     }
   };
 
   const handleClickSignUp = () => {
     navigation.navigate("Register");
+  };
+
+  const handleClickForgotPassword = () => {
+    navigation.navigate("Verify Email");
   }
 
   return (
@@ -90,9 +97,18 @@ const LoginScreen = ({navigation}) => {
             />
           </View>
 
-          <View style={styles.signUpFooter} >
-            <Text>Don't have an account?</Text>
-            <Text style={styles.textSignUp} onPress={handleClickSignUp}>Register</Text>
+          <View style={styles.wrapFooter}>
+            {/* Sign up */}
+            <View style={styles.signUpFooter}>
+              <Text>Don't have an account?</Text>
+              <Text style={styles.textSignUp} onPress={handleClickSignUp}>
+                Register
+              </Text>
+            </View>
+            {/* Forgot password */}
+            <TouchableOpacity onPress={handleClickForgotPassword}>
+              <Text style={styles.forgotPassword}>Forgot password?</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -123,11 +139,21 @@ const styles = StyleSheet.create({
   },
   wrapBtnSubmit: {
     marginVertical: 10,
-  },  
+  },
   btnSubmit: {
     marginVertical: 10,
     padding: 10,
     borderRadius: 5,
+  },
+  wrapFooter: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  forgotPassword: {
+    color: Colors.info,
+    textAlign: "right",
+    marginVertical: 10,
   },
   signUpFooter: {
     flexDirection: "row",

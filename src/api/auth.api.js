@@ -9,7 +9,7 @@ export const registerApi = async (data) => {
     headers: {
       'Content-Type': 'multipart/form-data',
       Accept: 'application/json',
-      type: 'formData',
+      // type: 'formData',
     },
   });
 };
@@ -20,4 +20,16 @@ export const logoutApi = (params) => {
 
 export const changePasswordApi = (body) => {
   return HTTP_SERVICE.post("/auth/change-password", body);
+};
+
+export const verifyEmailApi = async (params) => {
+  return await HTTP_SERVICE.get('/auth/verify-email', { params });
+};
+
+export const verifyOtpApi = async (data) => {
+  return await HTTP_SERVICE.post('/auth/verify-otp-email', data);
+};
+
+export const resetPasswordApi = async (body) => {
+  return await HTTP_SERVICE.post('/auth/reset-password', body);
 };
