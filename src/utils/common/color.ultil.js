@@ -1,5 +1,5 @@
 const Colors = {
-    white: "#FFFFFF",
+    white: "#ffffff",
     black: "#000000",
     primary: "#007bff",
     secondary: "#6c757d",
@@ -13,6 +13,7 @@ const Colors = {
     muted: "#6c757d",
     orange: "#FFA500",
     border: "#dcdcdc",
+    grey: "#808080",
 };
 
 export default Colors;
