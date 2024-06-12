@@ -20,12 +20,11 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import { optionGenders } from "../../utils/data.util";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
-import { registerApi } from "../../api/auth.api";
+import { registerApi, registerMobileApi } from "../../api/auth.api";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 
 const RegisterScreen = () => {
-
   const navigation = useNavigation();
 
   const [value, setValue] = useState(null);
@@ -71,8 +70,13 @@ const RegisterScreen = () => {
   const formatDate = (rawDate) => {
     const date = new Date(rawDate);
 
-    // return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    const getMonth = date.getMonth() + 1;
+    const month = getMonth < 10 ? `0${getMonth}` : getMonth;
+
+    const getDate = date.getDate();
+    const day = getDate < 10 ? `0${getDate}` : getDate;
+
+    return `${date.getFullYear()}-${month}-${day}`;
   };
 
   const onChangeDateTimePicker = (event, selectedDate) => {
@@ -93,8 +97,7 @@ const RegisterScreen = () => {
     // console.log("selectedDate", selectedDate);
   };
 
-  const onSubmit = async (data) =>{
-
+  const onSubmit = async (data) => {
     const formData = new FormData();
 
     const newValues = {
@@ -102,30 +105,53 @@ const RegisterScreen = () => {
       gender: value,
       dateOfBirth: dateOfBirth,
       roleIds: [2],
-      prefix: "+84",
+      prefix: "84",
+      // image: image,
     };
 
-    console.log("newValues", newValues);
+    formData.append("data", JSON.stringify(newValues));
 
-    formData.append('data', new Blob([JSON.stringify(newValues)], { type: 'application/json' }));
-    
-    const filename = image.split('/').pop();
-    console.log("filename", filename);
-    const match = /\.(\w+)$/.exec(filename);
+    const fileName = image.split("/").pop();
+    const match = /\.(\w+)$/.exec(fileName);
     const type = match ? `image/${match[1]}` : `image`;
 
-    console.log("type", type);
-    // registerApi(formData)
-    //   .then((res) => {
-    //     console.log(res);
-    //     if (res.status === 200) {
-    //       navigation.navigate("Login");
-    //     }
+    formData.append("file", {
+      uri: Platform.OS === "android" ? image : image.replace("file://", ""),
+      name: fileName,
+      type: type,
+    });
+
+    registerMobileApi(newValues)
+      .then((res) => {
+        console.log(res);
+        if (res) {
+          navigation.navigate("Login");
+          alert("Register successful! Please Login");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    // fetch("http://100.80.22.158:8088/api/auth/register", {
+    //   method: "POST",
+    //   body: formData,
+    //   headers: {
+    //     "Content-Type": "multipart/form-data",
+    //     Accept: "application/json",
+    //     type: "formData",
+    //   },
+    // })
+    //   .then((response) => {
+    //     console.log("response", response);
+    //   })
+    //   .then((responseJson) => {
+    //     console.log("responseJson", responseJson);
     //   })
     //   .catch((error) => {
-    //     console.log(error);
+    //     console.error(error);
     //   });
-  }
+  };
 
   return (
     <>
@@ -260,13 +286,13 @@ const RegisterScreen = () => {
             </View>
             {/* )} */}
 
-            <View style={styles.container}>
+            {/* <View style={styles.container}>
               <Button
                 title="Pick an image from camera roll"
                 onPress={pickImage}
               />
               {image && <Image source={{ uri: image }} style={styles.image} />}
-            </View>
+            </View> */}
 
             <Button
               title="Submit"
